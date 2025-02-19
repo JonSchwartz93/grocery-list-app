@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import axios from 'axios';
+import useDebounce from './hooks/useDebounce';
+import './App.css';
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const debouncedSearchTerm = useDebounce(searchTerm);
 
   useEffect(() => {
     const getProducts = async () => {
-      if (!searchTerm || searchTerm.length <= 2) {
+      if (!debouncedSearchTerm || debouncedSearchTerm.length <= 2) {
         setSearchResults([]);
         return;
       };
@@ -16,8 +18,8 @@ const App = () => {
       try {
         const response = await axios.get("http://localhost:8000/products", {
           params: {
-            ...(searchTerm.length > 2 && {
-              "filter.term": searchTerm
+            ...(debouncedSearchTerm.length > 2 && {
+              "filter.term": debouncedSearchTerm
             }),
           }
         })
@@ -27,15 +29,12 @@ const App = () => {
         console.error("Error fetching products:", error);
       } 
     }
-    getProducts(searchTerm);
+    getProducts(debouncedSearchTerm);
 
-  }, [searchTerm]);
+  }, [debouncedSearchTerm]);
 
-  console.log('the products', searchResults);
-
-  const handleSearch = (event) => {
-    const value = event.target.value;
-    setSearchTerm(value);
+  const handleChange = (event) => {
+    setSearchTerm(event.target.value);
   };
 
   return (
@@ -44,7 +43,7 @@ const App = () => {
           type="text"
           placeholder="Search for products here..."
           value={searchTerm}
-          onChange={handleSearch}
+          onChange={handleChange}
         >
 
         </input>
