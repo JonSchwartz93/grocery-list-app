@@ -49,9 +49,9 @@ const App = () => {
 
         </input>
         {
-          searchResults.map((product) => {
+          searchResults.map((product, index) => {
             return (
-              <div>
+              <div key={index}>
                 <p>{product.description} - {product.productId}</p>
               </div>
             )

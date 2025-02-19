@@ -15,23 +15,38 @@ const clientId = process.env.KROGER_CLIENT_ID;
 const clientSecret = process.env.KROGER_CLIENT_SECRET;
 const krogerBaseUrl = process.env.KROGER_BASE_URL;
 
+let krogerToken = null;
+let tokenExpiresAt = null;
 
 const getKrogerToken = async () => {
-  const response = await axios.post(
-    `${krogerBaseUrl}/connect/oauth2/token`,
-    new URLSearchParams({
-      grant_type: "client_credentials",
-      scope: "product.compact",
-    }),
-    {
-      headers: {
-        Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      }
-    }
-  )
+  const now = Date.now();
 
-  return response.data.access_token;
+  if (krogerToken && tokenExpiresAt && now < tokenExpiresAt) {
+    return krogerToken;
+  };
+
+  console.log("Fetching new Kroger access token...");
+
+  try {
+    const response = await axios.post(
+      `${krogerBaseUrl}/connect/oauth2/token`,
+      new URLSearchParams({
+        grant_type: "client_credentials",
+        scope: "product.compact",
+      }),
+      {
+        headers: {
+          Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        }
+      }
+    )
+    
+    krogerToken = response.data.access_token;
+    tokenExpiresAt = now + response.data.expires_in * 1000;
+  } catch (error) {
+    console.error(`Error fetching Kroger API token: ${error}`);
+  }
 }
 
 app.get('/products', async (req, res) => {
