@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+#prompt-wrapper {
+  width: 75%;
+}
+
+#prompt {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+#submit-prompt-button {
+  height: 40px;
+  width: 10%;
+  text-align: center;
+  background-color: green;
+}
+
+#submit-prompt-button-fetching {
+  height: 40px;
+  width: 10%;
+  text-align: center;
+  background-color: gray;
+}
