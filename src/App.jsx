@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useDebounce from './hooks/useDebounce';
 import './App.css';
+import { SearchResults } from './components/SearchResults';
+import { SearchInput } from './components/SearchInput';
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,7 +21,7 @@ const App = () => {
         const response = await axios.get("http://localhost:8000/products", {
           params: {
             ...(debouncedSearchTerm.length > 2 && {
-              "filter.term": debouncedSearchTerm
+              "filter.term": debouncedSearchTerm,
             }),
           }
         })
@@ -38,25 +40,10 @@ const App = () => {
   };
 
   return (
-      <div className="App">
-        <input
-          type="text"
-          placeholder="Search for products here..."
-          value={searchTerm}
-          onChange={handleChange}
-        >
-
-        </input>
-        {
-          searchResults.map((product, index) => {
-            return (
-              <div key={index}>
-                <p>{product.description} - {product.productId}</p>
-              </div>
-            )
-          })
-        }
-      </div>
+      <>
+        <SearchInput searchTerm={searchTerm} onChange={handleChange} />
+        <SearchResults searchResults={searchResults} />
+      </>
   );
 }
 
