@@ -52,6 +52,7 @@ const getKrogerToken = async () => {
 app.get('/products', async (req, res) => {
   try {
     const token = await getKrogerToken();
+
     const response = await axios.get(
       `${krogerBaseUrl}/products`,
       {
